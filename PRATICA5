@@ -1,0 +1,35 @@
+!pip install faker
+!pip install num2words
+from faker import Faker
+from num2words import num2words
+from wordcloud import WordCloud
+import random, ast
+import matplotlib.pyplot as plt
+
+fake = Faker('pt_BR')
+
+quantidade = 50
+notaspossiveis = 10
+lista = {fake.name(): random.randint(0,notaspossiveis) for i in range(quantidade)}
+print(lista)
+
+open('notas.txt', 'w').write(str(lista))
+lista = ast.literal_eval(open('notas.txt', 'r').read())
+
+lista = [lista[i] for i in lista]
+maior = 0
+for i in lista:
+    vezes = lista.count(i)
+    if vezes > maior:
+        maior = vezes
+        
+plt.hist(lista, notaspossiveis, facecolor='green', alpha=0.75, edgecolor='#000', linewidth=1.2)
+plt.xlabel('notas')
+plt.ylabel('quantidades')
+plt.title('Histograma de Notas')
+plt.show()
+
+lista = ','.join([num2words(i, lang='pt') for i in lista])
+nuvem_palavras = WordCloud(background_color='#fff').generate(lista)
+plt.imshow(nuvem_palavras, interpolation='bilinear')
+nuvem_palavras.to_file("Nuvem de palavras.png")
